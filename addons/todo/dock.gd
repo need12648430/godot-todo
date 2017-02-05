@@ -84,22 +84,40 @@ func find_files(directory, extensions, recur = false):
 	dir.list_dir_end()
 	return results
 
-func find_all_todos():
-	var files = find_files("res://", ["gd", "scn", "tscn", "xscn", "xml"], true)
+func get_all_scripts(node):
+	var scripts = [];
 	
+	var script = node.get_script()
+	if script != null:
+		scripts.append(script)
+	
+	for child in node.get_children():
+		for script in get_all_scripts(child):
+			scripts.append(script)
+	
+	return scripts
+
+func find_all_todos():
+	var files = find_files("res://", ["gd", "tscn", "xscn", "scn"], true)
+	var checked = []
 	var todos = []
 	
 	for file in files:
-		var file_todos = {"file": file}
-		var found = todos_in_file(file)
-		if file.extension() in ["gd", "tscn"]:
-			file_todos["todos"] = found
+		if file.extension().to_lower() == "gd":
+			var file_todos = {"file": file, "todos": []}
+			for todo in todos_in_file(file):
+				file_todos["todos"].append(todo)
+			todos.append(file_todos)
 		else:
-			if found.size() > 0:
-				file_todos["todos"] = [{"text": "Found TODOs in built-in scripts."}]
-			else:
-				file_todos["todos"] = []
-		todos.append(file_todos)
+			var scene = load(file).instance()
+			var scripts = get_all_scripts(scene)
+			for script in scripts:
+				if not script.get_path() in checked:
+					var file_todos = {"file": script.get_path(), "todos": []}
+					for todo in todos_in_string(script.get_source_code()):
+						file_todos["todos"].append(todo)
+					todos.append(file_todos)
+					checked.append(script.get_path())
 	
 	return todos
 
@@ -109,14 +127,23 @@ func todos_in_file(location):
 	
 	var file = File.new()
 	file.open(location, File.READ)
+	todos = todos_in_string(file.get_as_text())
+	file.close()
+	return todos
+
+func todos_in_string(string):
+	string = string.split("\n")
+	var todos = []
+	var line_count = 0
 	
-	while not file.eof_reached():
-		var line = file.get_line()
+	while string.size():
+		var line = string[0]
+		string.remove(0)
+		
 		line_count += 1
 		
 		var pos = re.find(line, 0)
 		if pos != -1:
 			todos.append({"line": line_count, "text": re.get_capture(1)})
 	
-	file.close()
 	return todos
