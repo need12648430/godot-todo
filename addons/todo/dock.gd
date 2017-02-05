@@ -51,6 +51,7 @@ func populate_tree():
 					todo_node.set_text(0, "Line %d: %s" % [todo["line"], todo["text"]])
 				else:
 					todo_node.set_text(0, todo["text"])
+					todo_node.move_to_bottom()
 					file_node.set_collapsed(true)
 
 func find_files(directory, extensions, recur = false):
@@ -75,7 +76,7 @@ func find_files(directory, extensions, recur = false):
 			for subfile in find_files(location, extensions, true):
 				results.append(subfile)
 		
-		if not dir.current_is_dir() and file.extension() in extensions:
+		if not dir.current_is_dir() and file.extension().to_lower() in extensions:
 			results.append(location)
 		
 		file = dir.get_next()
@@ -91,7 +92,7 @@ func find_all_todos():
 	for file in files:
 		var file_todos = {"file": file}
 		var found = todos_in_file(file)
-		if file.extension() == "gd":
+		if file.extension() in ["gd", "tscn"]:
 			file_todos["todos"] = found
 		else:
 			if found.size() > 0:
