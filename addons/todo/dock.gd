@@ -2,19 +2,32 @@ tool
 extends EditorPlugin
 
 var dock
+var texture_todo
+var texture_fixme
 var re = RegEx.new()
 
 func _enter_tree():
 	print("TODO created.")
-	re.compile("TODO\\:[:space:]*([^\\n]*)[:space:]*")
+	re.compile("(TODO|FIXME)\\:[:space:]*([^\\n]*)[:space:]*")
 	
 	dock = preload("scenes/TODO List.tscn").instance()
+	
+	texture_todo = ImageTexture.new()
+	texture_todo.load("res://addons/todo/images/todo.png")
+	
+	texture_fixme = ImageTexture.new()
+	texture_fixme.load("res://addons/todo/images/fixme.png")
+	
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_BL, dock)
 	dock.get_node("Toolbar/Refresh").connect("pressed", self, "populate_tree")
+	dock.get_node("Toolbar/TODO").connect("pressed", self, "populate_tree", ["TODO"])
+	dock.get_node("Toolbar/FIXME").connect("pressed", self, "populate_tree", ["FIXME"])
 	populate_tree()
 
 func _exit_tree():
 	dock.get_node("Toolbar/Refresh").disconnect("pressed", self, "populate_tree")
+	dock.get_node("Toolbar/TODO").disconnect("pressed", self, "populate_tree")
+	dock.get_node("Toolbar/FIXME").disconnect("pressed", self, "populate_tree")
 	remove_control_from_docks(dock)
 	print("TODO freed.")
 
@@ -23,7 +36,7 @@ func item_activated():
 	var file = tree.get_selected().get_metadata(0)
 	edit_resource(load(file))
 
-func populate_tree():
+func populate_tree(type_filter = null):
 	var tree = dock.get_node("Background/Scrollbar/Contents")
 	
 	tree.clear()
@@ -37,6 +50,12 @@ func populate_tree():
 	#tree.set_hide_folding(true)
 	
 	var files = find_all_todos()
+	
+	if type_filter == "TODO":
+		files = filter_results(files, "TODO")
+	elif type_filter == "FIXME":
+		files = filter_results(files, "FIXME")
+	
 	for file in files:
 		var where = file["file"]
 		var todos = file["todos"]
@@ -48,11 +67,29 @@ func populate_tree():
 				var todo_node = tree.create_item(file_node)
 				todo_node.set_metadata(0, file["file"])
 				if "line" in todo:
-					todo_node.set_text(0, "Line %d: %s" % [todo["line"], todo["text"]])
+					todo_node.set_text(0, "%03d: %s" % [todo["line"], todo["text"]])
+					todo_node.set_tooltip(0, todo["text"])
+					if todo["type"] == "TODO":
+						todo_node.set_icon(0, texture_todo)
+					else:
+						todo_node.set_icon(0, texture_fixme)
 				else:
 					todo_node.set_text(0, todo["text"])
 					todo_node.move_to_bottom()
 					file_node.set_collapsed(true)
+
+
+func filter_results(results, type):
+	var output = []
+	for file in results:
+		var filtered = {}
+		filtered["file"] = file["file"]
+		filtered["todos"] = []
+		for todo in file["todos"]:
+			if todo["type"] == type:
+				filtered["todos"].append(todo)
+		output.append(filtered)
+	return output
 
 func find_files(directory, extensions, recur = false):
 	var results = []
@@ -144,6 +181,6 @@ func todos_in_string(string):
 		
 		var pos = re.find(line, 0)
 		if pos != -1:
-			todos.append({"line": line_count, "text": re.get_capture(1)})
+			todos.append({"line": line_count, "type": re.get_capture(1), "text": re.get_capture(2)})
 	
 	return todos
