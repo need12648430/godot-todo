@@ -7,7 +7,6 @@ var texture_fixme
 var re = RegEx.new()
 
 func _enter_tree():
-	print("TODO created.")
 	re.compile("(TODO|FIXME)\\:[:space:]*([^\\n]*)[:space:]*")
 	
 	dock = preload("scenes/TODO List.tscn").instance()
@@ -29,7 +28,6 @@ func _exit_tree():
 	dock.get_node("Toolbar/TODO").disconnect("pressed", self, "populate_tree")
 	dock.get_node("Toolbar/FIXME").disconnect("pressed", self, "populate_tree")
 	remove_control_from_docks(dock)
-	print("TODO freed.")
 
 func item_activated():
 	var tree = dock.get_node("Background/Scrollbar/Contents")
@@ -140,11 +138,12 @@ func find_all_todos():
 	var todos = []
 	
 	for file in files:
-		if file.extension().to_lower() == "gd":
+		if file.extension().to_lower() == "gd" and not file in checked:
 			var file_todos = {"file": file, "todos": []}
 			for todo in todos_in_file(file):
 				file_todos["todos"].append(todo)
 			todos.append(file_todos)
+			checked.append(file)
 		else:
 			var scene = load(file).instance()
 			var scripts = get_all_scripts(scene)
