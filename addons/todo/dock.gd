@@ -138,7 +138,9 @@ func find_all_todos():
 	var todos = []
 	
 	for file in files:
-		if file.extension().to_lower() == "gd" and not file in checked:
+		if file.extension().to_lower() == "gd":
+			if file in checked:
+				continue
 			var file_todos = {"file": file, "todos": []}
 			for todo in todos_in_file(file):
 				file_todos["todos"].append(todo)
