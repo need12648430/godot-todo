@@ -1,19 +1,16 @@
 # TODO List
 
-----------
-
 ## What is it?
 
 A simple TODO list add-on for the Godot game engine. It looks at all GDScript (.gd) files and built-in scripts within all scenes(.tscn, .scn, .xscn) 
 for lines containing **TODO** or **FIXME** and displays them accordingly.
 
 > **Features:**
-
+> 
 > - GDScript files can be double-clicked to open for editing. 
 > - Built-in scripts require that the containing scene be open.
 > - Automatically look for TODOs and FIXMEs
 
--------------------
 
 ## Preview
 
@@ -24,6 +21,7 @@ for lines containing **TODO** or **FIXME** and displays them accordingly.
 ## MIT License (MIT)
 
 Copyright (c) 2017 Jahn Johansen
+
 Modifications Copyright (c) 2017 Ivan Skodje
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
