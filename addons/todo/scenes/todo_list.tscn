@@ -4,7 +4,7 @@
 [ext_resource path="res://addons/todo/images/fixme.png" type="Texture" id=2]
 [ext_resource path="res://addons/todo/images/todo.png" type="Texture" id=3]
 
-[node name="TODO List" type="VBoxContainer"]
+[node name="todo_list" type="VBoxContainer"]
 
 anchor/right = 1
 anchor/bottom = 1
@@ -18,8 +18,9 @@ margin/right = 0.0
 margin/bottom = 0.0
 alignment = 0
 
-[node name="Toolbar" type="HBoxContainer" parent="."]
+[node name="tool_bar" type="HBoxContainer" parent="."]
 
+editor/display_folded = true
 focus/ignore_mouse = false
 focus/stop_mouse = false
 size_flags/horizontal = 2
@@ -30,7 +31,7 @@ margin/right = 1024.0
 margin/bottom = 22.0
 alignment = 0
 
-[node name="Refresh" type="ToolButton" parent="Toolbar"]
+[node name="refresh" type="ToolButton" parent="tool_bar"]
 
 hint/tooltip = "Refresh, and show all entries."
 focus/ignore_mouse = false
@@ -48,7 +49,7 @@ shortcut = null
 icon = ExtResource( 1 )
 flat = true
 
-[node name="FIXME" type="ToolButton" parent="Toolbar"]
+[node name="fixme" type="ToolButton" parent="tool_bar"]
 
 hint/tooltip = "Show only FIXME entries."
 focus/ignore_mouse = false
@@ -66,7 +67,7 @@ shortcut = null
 icon = ExtResource( 2 )
 flat = true
 
-[node name="TODO" type="ToolButton" parent="Toolbar"]
+[node name="todo" type="ToolButton" parent="tool_bar"]
 
 hint/tooltip = "Show only TODO entries."
 focus/ignore_mouse = false
@@ -84,8 +85,26 @@ shortcut = null
 icon = ExtResource( 3 )
 flat = true
 
-[node name="Background" type="Panel" parent="."]
+[node name="auto_refresh_toggle" type="CheckButton" parent="tool_bar"]
 
+focus/ignore_mouse = false
+focus/stop_mouse = true
+size_flags/horizontal = 2
+size_flags/vertical = 2
+margin/left = 86.0
+margin/top = 0.0
+margin/right = 244.0
+margin/bottom = 22.0
+toggle_mode = true
+enabled_focus_mode = 2
+shortcut = null
+text = "Auto Refresh"
+flat = false
+align = 0
+
+[node name="background" type="Panel" parent="."]
+
+editor/display_folded = true
 focus/ignore_mouse = false
 focus/stop_mouse = true
 size_flags/horizontal = 3
@@ -95,7 +114,7 @@ margin/top = 26.0
 margin/right = 1024.0
 margin/bottom = 600.0
 
-[node name="Scrollbar" type="ScrollContainer" parent="Background"]
+[node name="scroll_bar" type="ScrollContainer" parent="background"]
 
 anchor/right = 1
 anchor/bottom = 1
@@ -110,7 +129,7 @@ margin/bottom = 0.0
 scroll/horizontal = false
 scroll/vertical = true
 
-[node name="Contents" type="Tree" parent="Background/Scrollbar"]
+[node name="contents" type="Tree" parent="background/scroll_bar"]
 
 focus/ignore_mouse = false
 focus/stop_mouse = false
