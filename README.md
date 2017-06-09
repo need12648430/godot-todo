@@ -3,7 +3,7 @@
 ## What is it?
 
 A simple TODO list add-on for the Godot game engine. It looks at all GDScript (.gd) files and built-in scripts within all scenes(.tscn, .scn, .xscn) 
-for lines containing **TODO** or **FIXME** and displays them accordingly.
+for lines containing **TODO:** or **FIXME:** and displays them accordingly.
 
 > **Features:**
 > 
